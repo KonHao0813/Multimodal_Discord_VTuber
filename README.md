@@ -1,1 +1,123 @@
-# AI_vtuber_discord_bot
+# Multimodal Discord VTuber
+
+一個結合了多模態 AI 和語音互動的 Discord 虛擬主播機器人。
+
+## 簡介
+
+這個專案旨在建立一個能夠在 Discord 伺服器中擔任虛擬主播的機器人。它具備以下功能：
+
+* **文字互動：** 回應使用者的文字訊息。
+* **圖片分析：** 能夠理解並回應使用者上傳的圖片內容。
+* **語音聊天：** 加入語音頻道，並以語音回覆使用者的訊息。
+* **多種人格：** 支援切換不同的 AI 人格，例如傲嬌、諷刺、含蓄、活力充沛、哲學思考和偶像風格。
+* **記憶功能：** 能夠記住之前的對話內容，提供更連貫的互動。
+* **台灣用語優化：** 將 AI 的回覆轉換為更符合台灣使用者習慣的用語。
+
+## 開始使用
+
+以下是如何在本機端設定並運行這個 Discord 機器人的步驟。
+
+### 先決條件
+
+在開始之前，請確保你已經安裝了以下軟體和函式庫：
+
+* **Python 3.7 或更高版本**
+* **pip** (Python 的套件管理工具)
+* **Discord.py** (`pip install discord.py`)
+* **transformers** (`pip install transformers`)
+* **sentence-transformers** (`pip install sentence-transformers`)
+* **torch** (`pip install torch`) (建議安裝 CUDA 版本以獲得更好的效能)
+* **zhconv** (`pip install zhconv`)
+* **edge-tts** (`pip install edge-tts`)
+* **python-dotenv** (`pip install python-dotenv`)
+* **ffmpeg** (請參考下方的安裝說明)
+
+#### 安裝 ffmpeg
+
+Discord.py 在播放語音時需要 `ffmpeg`。請根據你的作業系統進行安裝：
+
+* **Windows:**
+    1.  前往 [ffmpeg 官方網站](https://ffmpeg.org/download.html)，下載對應的版本。
+    2.  解壓縮下載的檔案到你的電腦上。
+    3.  將 `ffmpeg` 的 `bin` 目錄添加到你的系統環境變數 `PATH` 中。
+* **macOS:**
+    使用 Homebrew 安裝：`brew install ffmpeg`
+* **Linux (Debian/Ubuntu):**
+    `sudo apt update && sudo apt install ffmpeg`
+* **Linux (Fedora/CentOS):**
+    `sudo dnf install ffmpeg`
+
+### 安裝步驟
+
+1.  **複製專案到你的本機：**
+    ```bash
+    git clone [你的專案 GitHub 連結]
+    cd [你的專案目錄名稱]
+    ```
+2.  **建立並激活虛擬環境 (建議):**
+    ```bash
+    python -m venv venv
+    source venv/bin/activate  # 在 macOS 和 Linux 上
+    venv\Scripts\activate  # 在 Windows 上
+    ```
+3.  **安裝所需的 Python 函式庫：**
+    ```bash
+    pip install -r requirements.txt
+    ```
+    (如果你的專案還沒有 `requirements.txt` 檔案，你可以使用 `pip freeze > requirements.txt` 來產生一個。)
+4.  **設定環境變數：**
+    * 在專案根目錄下建立一個 `.env` 檔案。
+    * 在 `.env` 檔案中填入你的 Discord 機器人 Token 和文字頻道 ID：
+        ```env
+        DISCORD_TOKEN=你的_Discord_機器人_Token
+        TEXT_CHANNEL_ID=你的_Discord_文字頻道_ID
+        ```
+        * **獲取 Discord 機器人 Token：** 請在 Discord Developer Portal ([https://discord.com/developers/applications](https://discord.com/developers/applications)) 創建一個機器人應用程式，並在 "Bot" 頁面獲取 Token。
+        * **獲取文字頻道 ID：** 在你的 Discord 伺服器中，開啟開發者模式（使用者設定 -> 進階 -> 開發者模式），然後右鍵點擊你希望機器人互動的文字頻道，選擇 "複製 ID"。
+
+## 使用方式
+
+1.  **運行機器人：**
+    在你的終端機中，導航到專案根目錄，然後運行：
+    ```bash
+    python main.py
+    ```
+2.  **在 Discord 中與機器人互動：**
+    * 將你的機器人邀請到你的 Discord 伺服器中。
+    * 在你在 `.env` 檔案中設定的文字頻道中，你可以開始與機器人互動。
+
+### 可用指令
+
+機器人支援以下指令（請在訊息前加上 `!` 作為前綴）：
+
+* **`!join`**: 讓機器人加入你所在的語音頻道。
+* **`!leave`**: 讓機器人離開它所在的語音頻道。
+* **`!mode <模式名稱>`**: 切換機器人的人格模式。可用的模式包括：
+    * `tsundere`: 傲嬌模式
+    * `sarcastic`: 諷刺幽默
+    * `shy`: 含蓄委婉
+    * `energetic`: 活力充沛
+    * `philosophical`: 哲學思考
+    * `idol`: 偶像風格
+* **`!forget`**: 清除機器人的記憶。
+
+### 範例互動
+使用者: 你好
+AIVtuber: 你好！有什麼我能幫你的嗎？
+
+使用者: !mode tsundere
+AIVtuber: 🔄 已切換至 tsundere 模式 - 傲嬌模式（70%毒舌 + 30%關心）
+
+使用者: 你好啊
+AIVtuber: 哼！你好啦，笨蛋。 (其實還挺高興你跟我說話的...)
+
+使用者: !join
+AIVtuber: 🎤 已加入 [你的語音頻道名稱]
+
+
+## 貢獻
+
+如果你想為這個專案做出貢獻，歡迎提交 Pull Request。請確保你的程式碼風格與現有程式碼保持一致，並添加適當的註解。
+
+## 授權
+MIT License
