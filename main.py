@@ -2,32 +2,40 @@ import discord
 import asyncio
 from discord.ext import commands
 import os
+import discord.ext.commands
 import edge_tts
 import datetime
 import logging
 from dotenv import load_dotenv
 from ai_core import OptimizedMultimodalAIVtuber, PersonalityManager
+import discord.ext
 
 # 載入環境變數
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 TEXT_CHANNEL_ID = int(os.getenv('TEXT_CHANNEL_ID'))
 
-class MultimodalDiscordVTuber(commands.Bot):
+class Bot(commands.Bot):
+    pass
+
+class Ctx(commands.Context):
+    pass
+    
+class MultimodalDiscordVTuber(Bot):
     def __init__(self):
         print("正在初始化 MultimodalDiscordVTuber...")
         intents = discord.Intents.default()
         intents.message_content = True
-        super().__init__(command_prefix='!', intents=intents)
+        bot = Bot(command_prefix='!', intents=intents)
         self.ai = OptimizedMultimodalAIVtuber()  # 這裡不需要修改，因為預設值就是 "Qwen/Qwen-1_8B-Chat-Int4"
         print("self.ai 已初始化")
         self._my_voice_clients = {}
         self.text_channel_id = TEXT_CHANNEL_ID # 將全域變數的值賦給實例屬性
         self.setup_commands()
 
-    def setup_commands(self):
-        @self.command()
-        async def join(ctx):
+    def setup_commands(self, bot: Bot):
+        @bot.command()
+        async def join(ctx: Ctx):
             if ctx.author.voice:
                 channel = ctx.author.voice.channel
                 voice_client = await channel.connect()
@@ -36,8 +44,8 @@ class MultimodalDiscordVTuber(commands.Bot):
             else:
                 await ctx.send("⚠️ 請先加入語音頻道！")
 
-        @self.command()
-        async def leave(ctx):
+        @bot.command()
+        async def leave(ctx: Ctx):
             if ctx.guild.id in self._my_voice_clients:  # 使用新的屬性名稱
                 await self._my_voice_clients[ctx.guild.id].disconnect()  # 使用新的屬性名稱
                 del self._my_voice_clients[ctx.guild.id]  # 使用新的屬性名稱
@@ -45,8 +53,8 @@ class MultimodalDiscordVTuber(commands.Bot):
             else:
                 await ctx.send("⚠️ 我不在語音頻道中")
 
-        @self.command()
-        async def mode(ctx, mode_name: str):
+        @bot.command()
+        async def mode(ctx: Ctx, mode_name: str):
             personalities = PersonalityManager.get_all_personalities()
             if mode_name in personalities:
                 self.ai.personality = mode_name
@@ -55,8 +63,8 @@ class MultimodalDiscordVTuber(commands.Bot):
                 personality_list = "\n".join([f"• `{k}`: {v}" for k, v in personalities.items()])
                 await ctx.send(f"❌ 無效模式，可用選項：\n{personality_list}")
 
-        @self.command()
-        async def forget(ctx):
+        @bot.command()
+        async def forget(ctx: Ctx):
             self.ai.memory.history.clear()
             self.ai.memory._save_memory()
             await ctx.send("🧹 記憶已清除")
